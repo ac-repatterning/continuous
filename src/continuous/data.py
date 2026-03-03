@@ -81,10 +81,11 @@ class Data:
 
         return block
 
-    def exc(self, partition: pr.Partition) -> pd.DataFrame:
+    def exc(self, partition: pr.Partition, names: list) -> pd.DataFrame:
         """
 
         :param partition: Refer to src.elements.partitions
+        :param names:
         :return:
         """
 
@@ -92,8 +93,10 @@ class Data:
         prefix = self.__endpoint + str(partition.catchment_id) + '/' + str(partition.ts_id)
 
         # Hence
-        listings = self.__pre.objects(prefix=prefix)
-        keys = [f's3://{self.__bucket_name}/{listing}' for listing in listings]
+        # listings = self.__pre.objects(prefix=prefix)
+
+
+        keys = [f's3://{self.__bucket_name}/{prefix}/{name}.csv' for name in names]
         block = self.__get_data(keys=keys)
 
         # Starting from ...
