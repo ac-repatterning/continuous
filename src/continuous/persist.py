@@ -22,15 +22,11 @@ class Persist:
         :param frequency: The granularity of the data, in hours.
         """
 
-        self.__reference = reference
+        self.__reference = reference.copy().drop(columns=['starting', 'ts_name'])
         self.__interval = frequency * 60 * 60 * 1000
 
         # The storage area
         self.__configurations = config.Config()
-        self.__endpoint = os.path.join(self.__configurations.points_, 'continuous')
-
-        # Ensure the storage area exists
-        src.functions.directories.Directories().create(self.__endpoint)
 
         # For creating JSON files
         self.__objects = src.functions.objects.Objects()
@@ -73,9 +69,9 @@ class Persist:
         nodes = self.__get_nodes(data=data)
         nodes['interval'] = self.__interval
         nodes['starting'] = int(data['timestamp'].min())
-        nodes['attributes'] = self.__get_attributes(ts_id=partition.ts_id)
+        nodes.update(self.__get_attributes(ts_id=partition.ts_id))
 
         message = self.__objects.write(
-            nodes=nodes, path=os.path.join(self.__endpoint, f'{partition.ts_id}.json'))
+            nodes=nodes, path=os.path.join(self.__configurations.points_, f'{partition.ts_id}.json'))
 
         return message
