@@ -8,7 +8,7 @@ import dask.dataframe as ddf
 import numpy as np
 import pandas as pd
 
-import src.elements.partitions as pr
+import src.elements.partition as pr
 import src.elements.s3_parameters as s3p
 import src.elements.service as sr
 import src.s3.prefix
@@ -81,7 +81,7 @@ class Data:
 
         return block
 
-    def exc(self, partition: pr.Partitions) -> pd.DataFrame:
+    def exc(self, partition: pr.Partition) -> pd.DataFrame:
         """
 
         :param partition: Refer to src.elements.partitions
