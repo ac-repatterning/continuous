@@ -10,8 +10,6 @@ import pandas as pd
 
 import src.elements.partition as pr
 import src.elements.s3_parameters as s3p
-import src.elements.service as sr
-import src.s3.prefix
 
 
 class Data:
@@ -19,10 +17,9 @@ class Data:
     Data
     """
 
-    def __init__(self, service: sr.Service, s3_parameters: s3p.S3Parameters, arguments: dict):
+    def __init__(self, s3_parameters: s3p.S3Parameters, arguments: dict):
         """
 
-        :param service: A suite of services for interacting with Amazon Web Services.
         :param s3_parameters: The overarching S3 parameters settings of this
                               project, e.g., region code name, buckets, etc.
         :param arguments: A set of arguments vis-à-vis calculation & storage objectives.
@@ -33,7 +30,6 @@ class Data:
 
         self.__limit = self.__get_limit()
         self.__endpoint, self.__bucket_name = self.__get_interfaces()
-        self.__pre = src.s3.prefix.Prefix(service=service, bucket_name=self.__bucket_name)
 
         # Focus
         self.__dtype = {'timestamp': np.float64, 'ts_id': np.float64, 'measure': float}
@@ -91,11 +87,6 @@ class Data:
 
         # In focus
         prefix = self.__endpoint + str(partition.catchment_id) + '/' + str(partition.ts_id)
-
-        # Hence
-        # listings = self.__pre.objects(prefix=prefix)
-
-
         keys = [f's3://{self.__bucket_name}/{prefix}/{name}.csv' for name in names]
         block = self.__get_data(keys=keys)
 
