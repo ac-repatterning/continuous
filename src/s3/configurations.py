@@ -4,6 +4,7 @@ import json
 import boto3
 import yaml
 
+import config
 import src.functions.secret
 import src.s3.unload
 
@@ -37,7 +38,7 @@ class Configurations:
         """
 
         buffer = src.s3.unload.Unload(s3_client=self.__s3_client).exc(
-            bucket_name=self.__secret.exc(secret_id='HydrographyProject', node='configurations'),
+            bucket_name=self.__secret.exc(secret_id=config.Config().project_key_name, node='configurations'),
             key_name=key_name)
 
         return buffer
