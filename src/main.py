@@ -22,7 +22,7 @@ def main():
         service=service, s3_parameters=s3_parameters, arguments=arguments).exc()
 
     src.continuous.interface.Interface(
-        service=service, s3_parameters=s3_parameters, listings=listings, arguments=arguments).exc(
+        s3_parameters=s3_parameters, listings=listings, arguments=arguments).exc(
         partitions=partitions, reference=reference)
 
     # Transferring calculations to an Amazon S3 (Simple Storage Service) bucket
