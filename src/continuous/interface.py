@@ -4,7 +4,7 @@ import logging
 import dask
 import pandas as pd
 
-import src.elements.partitions as pr
+import src.elements.partition as pr
 import src.elements.s3_parameters as s3p
 import src.elements.service as sr
 import src.continuous.data
@@ -29,7 +29,7 @@ class Interface:
         self.__s3_parameters = s3_parameters
         self.__arguments = arguments
 
-    def exc(self, partitions: list[pr.Partitions], reference: pd.DataFrame):
+    def exc(self, partitions: list[pr.Partition], reference: pd.DataFrame):
         """
 
         :param partitions: The time series partitions.
