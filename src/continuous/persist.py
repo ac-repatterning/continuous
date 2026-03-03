@@ -5,7 +5,7 @@ import os
 import pandas as pd
 
 import config
-import src.elements.partitions as pr
+import src.elements.partition as pr
 import src.functions.directories
 import src.functions.objects
 
@@ -60,7 +60,7 @@ class Persist:
 
         return {'data': _data}
 
-    def exc(self, data: pd.DataFrame, partition: pr.Partitions) -> str:
+    def exc(self, data: pd.DataFrame, partition: pr.Partition) -> str:
         """
 
         :param data:
