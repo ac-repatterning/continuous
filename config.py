@@ -28,3 +28,7 @@ class Config:
 
         # The prefix of the Amazon repository where the quantiles will be stored
         self.prefix = 'warehouse/continuous'
+
+        # Project metadata
+        self.project_tag = 'hydrography'
+        self.project_key_name = 'HydrographyProject'
