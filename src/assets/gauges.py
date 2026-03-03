@@ -1,4 +1,7 @@
 """Module gauges.py"""
+
+import datetime
+
 import numpy as np
 import pandas as pd
 
@@ -24,6 +27,10 @@ class Gauges:
         self.__s3_parameters = s3_parameters
         self.__arguments = arguments
 
+        spanning = self.__arguments.get('spanning')
+        as_from = datetime.date.today() - datetime.timedelta(days=round(spanning*365.25))
+        self.__as_from = pd.to_datetime(f'{as_from.year}-01-01', format='%Y-%m-%d')
+
         # An instance for interacting with objects within an Amazon S3 prefix
         self.__pre = src.s3.prefix.Prefix(
             service=self.__service,
@@ -44,7 +51,7 @@ class Gauges:
         rename = {0: 'endpoint', 1: 'catchment_id', 2: 'ts_id', 3: 'name'}
         splittings = values['uri'].str.rsplit('/', n=3, expand=True)
         splittings.rename(columns=rename, inplace=True)
-        splittings['date'] = splittings['name'].str.replace('.csv', '')
+        splittings['name'] = splittings['name'].str.replace('.csv', '')
 
         # Collating
         values = values.copy().join(splittings, how='left')
@@ -91,7 +98,9 @@ class Gauges:
         # Types
         values['catchment_id'] = values['catchment_id'].astype(dtype=np.int64)
         values['ts_id'] = values['ts_id'].astype(dtype=np.int64)
-        values['date'] = pd.to_datetime(values['date'], format='%Y-%m-%d')
-        values.drop(columns=['endpoint', 'name'], inplace=True)
+        values['date'] = pd.to_datetime(values['name'], format='%Y-%m-%d')
+        values.drop(columns=['endpoint'], inplace=True)
 
-        return values
+        filtered = values.copy().loc[values['date'] >= self.__as_from, :]
+
+        return filtered
