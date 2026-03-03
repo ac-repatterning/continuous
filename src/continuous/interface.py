@@ -1,0 +1,61 @@
+"""Module interface.py"""
+import logging
+
+import dask
+import pandas as pd
+
+import src.elements.partition as pr
+import src.elements.s3_parameters as s3p
+import src.continuous.data
+import src.continuous.persist
+
+
+class Interface:
+    """
+    The interface to quantiles calculations.
+    """
+
+    def __init__(self, s3_parameters: s3p.S3Parameters, listings: pd.DataFrame, arguments: dict):
+        """
+
+        :param s3_parameters: The overarching S3 parameters settings of this
+                              project, e.g., region code name, buckets, etc.
+        :param listings:
+        :param arguments: A set of arguments vis-à-vis calculation & storage objectives.
+        """
+
+        self.__s3_parameters = s3_parameters
+        self.__listings = listings
+        self.__arguments = arguments
+
+    @dask.delayed
+    def __get_names(self, partition: pr.Partition) -> list:
+
+        __names: pd.Series = self.__listings.copy().loc[self.__listings['ts_id'] == partition.ts_id, 'name']
+
+        return __names.unique().tolist()
+
+    def exc(self, partitions: list[pr.Partition], reference: pd.DataFrame):
+        """
+
+        :param partitions: The time series partitions.
+        :param reference: The reference sheet of gauges.  Each instance encodes the attributes of a gauge.
+        :return:
+        """
+
+        # Delayed tasks
+        __data = dask.delayed(src.continuous.data.Data(
+            s3_parameters=self.__s3_parameters, arguments=self.__arguments).exc)
+        __persist = dask.delayed(src.continuous.persist.Persist(
+            reference=reference, frequency=self.__arguments.get('frequency')).exc)
+
+        # Compute
+        computations = []
+        for partition in partitions:
+            names = self.__get_names(partition=partition)
+            data = __data(partition=partition, names=names)
+            message = __persist(data=data, partition=partition)
+            computations.append(message)
+        messages = dask.compute(computations, scheduler='threads')[0]
+
+        logging.info(messages)
