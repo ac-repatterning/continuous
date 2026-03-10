@@ -51,7 +51,7 @@ class Persist:
         :return:
         """
 
-        string = data.copy()['measure'].to_json(orient='split')
+        string = data.copy()[['timestamp', 'measure']].to_json(orient='split')
         _data = json.loads(string)['data']
 
         return {'data': _data}
