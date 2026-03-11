@@ -68,7 +68,6 @@ class Persist:
 
         nodes = self.__get_nodes(data=data)
         nodes['interval'] = self.__interval
-        nodes['starting'] = int(data['timestamp'].min())
         nodes.update(self.__get_attributes(ts_id=partition.ts_id))
 
         message = self.__objects.write(
